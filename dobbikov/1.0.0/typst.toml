@@ -1,0 +1,12 @@
+[package]
+name = "dobbikov"
+version = "1.0.0"
+entrypoint = "dobbikov.typ"
+authors = ["Yehor KOROTENKO <yehor.korotenko@outlook.com>"]
+license = "MIT"
+description = ""
+homepage = ""
+
+[template]
+path = "template"
+entrypoint = "main.typ"
