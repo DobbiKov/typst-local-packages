@@ -98,24 +98,294 @@
 
 // Theorem environments
 #let thm-args = (padding: (x: 0.5em, y: 0.6em), outset: 0.9em, counter: "thm", base-level: 1)
-#let thm = thm-plain("Theorem",  fill: rgb("#eeeeff"), ..thm-args)
-#let lem = thm-plain("Lemma", fill: rgb("#eeeeff"), ..thm-args)
-#let prop = thm-plain("Proposition", fill: rgb("#eeeeff"), ..thm-args)
-#let notation = thm-plain("Notation", fill: rgb("#eeeeff"), ..thm-args)
-#let cor = thm-plain("Corollary", fill: rgb("#eeeeff"), ..thm-args)
-#let conj = thm-plain("Conjecture", fill: rgb("#eeeeff"), ..thm-args)
-#let ex = thm-def("Example", fill: rgb("#ffeeee"), ..thm-args)
+/// Creates a reusable border+title styling preset for theorem environments.
+///
+/// Returns a *style factory* (a function like `thm-plain.with(...)`) that you can
+/// call with a heading and normal theorem args.
+/// Example:
+/// ```
+/// #let scarlet = thm-border-style(color.rgb(140, 0, 30))
+/// #let theorem = scarlet("Theorem", ..thm-args)
+/// #let prop = scarlet("Proposition", ..thm-args)
+/// ```
+/// - stroke-color (color): Border + title/name color.
+/// - stroke-width (length): Border width.
+/// - title-fmt (function): Formatting for the head+number.
+/// - name-fmt (function): Formatting for the optional parenthesized name/info.
+/// - body-fmt (function): Formatting for the body text.
+/// - fill (color|none): Box fill.
+#let thm-border-style(
+  stroke-color,
+  stroke-width: 0.5pt,
+  title-fmt: auto,
+  name-fmt: auto,
+  body-fmt: auto,
+  fill: none,
+) = {
+  let title-fmt = if title-fmt == auto {
+    x => text(fill: stroke-color)[#strong(smallcaps([#x]))]
+  } else {
+    title-fmt
+  }
+  let name-fmt = if name-fmt == auto {
+    x => text(fill: stroke-color)[#strong(smallcaps([~(#x)]))]
+  } else {
+    name-fmt
+  }
+  let body-fmt = if body-fmt == auto {
+    x => text(fill: black)[#emph(x)]
+  } else {
+    body-fmt
+  }
+  thm-plain.with(
+    fill: fill,
+    stroke: stroke-color + stroke-width,
+    title-fmt: title-fmt,
+    name-fmt: name-fmt,
+    body-fmt: body-fmt,
+  )
+}
+
+/// Convenience helper that creates a ready-to-use theorem env in one call.
+/// Example:
+/// ```
+/// #let theorem = thm-bordered("Theorem", color.rgb(140, 0, 30), ..thm-args)
+/// ```
+#let thm-bordered(head, stroke-color, ..args) = {
+  thm-border-style(stroke-color)(head, ..args)
+}
+
+/// Creates a borderless variant that keeps the same title/name/body styling.
+/// Example:
+/// ```
+/// #let calm = thm-borderless-style(color.rgb(110, 0, 40))
+/// #let theorem = calm("Theorem", ..thm-args)
+/// ```
+/// - accent-color (color): Title/name color.
+/// - title-fmt/name-fmt/body-fmt/fill: Same as in @@thm-border-style.
+#let thm-borderless-style(
+  accent-color,
+  title-fmt: auto,
+  name-fmt: auto,
+  body-fmt: auto,
+  fill: none,
+) = thm-border-style(
+  accent-color,
+  stroke-width: 0pt,
+  title-fmt: title-fmt,
+  name-fmt: name-fmt,
+  body-fmt: body-fmt,
+  fill: fill,
+)
+
+/// Creates a left-double-bar style (two vertical bars on the left).
+/// Example:
+/// ```
+/// #let leftbars = thm-leftbars-style(color.rgb(110, 0, 40))
+/// #let theorem = leftbars("Theorem", ..thm-args)
+/// #let prop = leftbars("Proposition", ..thm-args)
+/// ```
+/// - accent-color (color): Bar + title/name color.
+/// - bar-width (length): Width of each bar.
+/// - bar-gap (length): Gap between the two bars.
+/// - inner-gap (length): Gap between bars and content.
+/// - separator/title-fmt/name-fmt/body-fmt/fill: Same as in @@thm-border-style.
+#let thm-leftbars-style(
+  accent-color,
+  bar-width: 0.6pt,
+  bar-gap: 1.2pt,
+  inner-gap: 0.6em,
+  separator: [.#h(0.2em)],
+  title-fmt: auto,
+  name-fmt: auto,
+  body-fmt: auto,
+  fill: none,
+) = {
+  let title-fmt = if title-fmt == auto {
+    x => text(fill: accent-color)[#strong(smallcaps(x))]
+  } else {
+    title-fmt
+  }
+  let name-fmt = if name-fmt == auto {
+    x => text(fill: accent-color)[#strong(smallcaps([~(#x)]))]
+  } else {
+    name-fmt
+  }
+  let body-fmt = if body-fmt == auto {
+    x => text(fill: black)[#emph(x)]
+  } else {
+    body-fmt
+  }
+
+  (head,
+    counter: auto,
+    ..args,
+    numbering: "1.1",
+    supplement: auto,
+    padding: (y: 0.1em),
+    separator: separator,
+    base: "heading",
+    base-level: none,
+  ) => {
+    if counter == auto {
+      counter = head
+    }
+    if supplement == auto {
+      supplement = head
+    }
+    let fmt(
+      name,
+      number,
+      body,
+      title: auto,
+      padding: padding,
+      separator: separator,
+      ..args_individual
+    ) = {
+      if not name == none {
+        name = [ #name-fmt(name)]
+      } else {
+        name = []
+      }
+      if title == auto {
+        title = head
+      }
+      if not number == none {
+        title += " " + number
+      }
+      title = title-fmt(title)
+      body = body-fmt(body)
+      let content = block(width: 100%, [#title#name#separator#body])
+      let bars = block(
+        width: 100%,
+        fill: fill,
+        stroke: (left: accent-color + bar-width),
+        inset: (left: bar-width + bar-gap),
+        block(
+          width: 100%,
+          stroke: (left: accent-color + bar-width),
+          inset: (left: bar-width + inner-gap),
+          content
+        )
+      )
+      pad(
+        ..padding,
+        block(
+          width: 100%,
+          ..args.named(),
+          ..args_individual.named(),
+          bars
+        )
+      )
+    }
+    return thm-env(
+      counter,
+      fmt,
+      base: base,
+      base-level: base-level,
+    ).with(
+      numbering: numbering,
+      supplement: supplement,
+      restate-keys: (head, )
+    )
+  }
+}
+
+#let thm-red-color = color.rgb(110, 0, 40)
+#let thm-red = thm-plain(
+  "Theorem",
+  fill: none,
+  stroke: thm-red-color + 1pt,
+  title-fmt: x => text(fill: thm-red-color)[#strong(x)],
+  name-fmt: x => text(fill: thm-red-color)[#strong([(#x)])],
+  body-fmt: x => text(fill: black)[#emph(x)],
+  ..thm-args
+)
+#let thm-red-style = thm-leftbars-style(thm-red-color)
+#let def-red-style = thm-border-style(thm-red-color)
+#let basic-red-style = thm-borderless-style(thm-red-color)
+#let defn-base = thm-red-style(
+  "Definition",
+  separator: text(fill: thm-red-color)[#strong(smallcaps([~–~]))],
+  ..thm-args
+)
+/// Creates a base environment using the "red" style and the default dash separator.
+/// Intended to be wrapped with @@thm-with-info.
+/// Example:
+/// ```
+/// #let prop = thm-with-info(any-base("Proposition"))
+/// ```
+#let border-base(
+  head,
+  separator: text(fill: thm-red-color)[#strong(smallcaps([~–~]))],
+  ..args,
+) = def-red-style(
+  head,
+  separator: separator,
+  ..thm-args,
+  ..args,
+)
+#let borderless-base(
+  head,
+  separator: text(fill: thm-red-color)[#strong(smallcaps([~–]))],
+  ..args,
+) = thm-borderless-style(thm-red-color)(
+  head,
+  separator: separator,
+  ..thm-args,
+  ..args,
+)
+#let leftbars-base(
+  head,
+  separator: text(fill: thm-red-color)[#strong(smallcaps([~–~]))],
+  ..args,
+) = thm-leftbars-style(thm-red-color)(
+  head,
+  separator: separator,
+  ..thm-args,
+  ..args,
+)
+/// Wraps a theorem environment to add an optional `info` parameter.
+/// `info` overrides the positional name and is passed as the environment name.
+/// Example:
+/// ```
+/// #let defn = thm-with-info(defn-base)
+/// #let theorem = thm-with-info(thm)
+/// #let remark = thm-with-info(rmk)
+/// ```
+#let thm-with-info(env) = {
+  (..args, body, info: auto) => {
+    let name = none
+    if args.pos().len() > 0 {
+      name = args.pos().first()
+    }
+    if info != auto {
+      name = info
+    }
+    if name == none {
+      env(..args.named(), body)
+    } else {
+      env(name, ..args.named(), body)
+    }
+  }
+}
+
+#let defn = thm-with-info(border-base("Definition"))
+#let thm = thm-with-info(leftbars-base("Theorem"))
+#let lem = thm-with-info(border-base("Lemma"))
+#let prop = thm-with-info(border-base("Proposition"))
+#let notation = thm-with-info(borderless-base("Notation"))
+#let cor = thm-with-info(borderless-base("Corollary"))
+#let conj = thm-with-info(borderless-base("Conjecture"))
+#let ex = thm-with-info(border-base("Example"))
 #let algo = thm-def("Algorithm", fill: rgb("#ddffdd"), ..thm-args)
 #let claim = thm-def("Claim", fill: rgb("#ddffdd"), ..thm-args)
-#let rmk = thm-def("Remark", fill: rgb("#eeeeee"), ..thm-args)
-#let defn = thm-def("Definition", ..thm-args)
-#let prob = thm-def("Problem", fill: rgb("#eeeeee"), ..thm-args)
-#let exer = thm-def("Exercise", fill: rgb("#eeeeee"), ..thm-args)
-#let exerstar = thm-def("Exercise", fill: rgb("#eeeeee"),
-  title-fmt: (x) => { strong(x + " (*)") },
-  ..thm-args)
-#let ques = thm-def("Question", fill: rgb("#eeeeee"), ..thm-args)
-#let fact = thm-def("Fact", fill: rgb("#eeeeee"), ..thm-args)
+#let rmk = thm-with-info(borderless-base("Remark"))
+#let prob = thm-with-info(borderless-base("Problem"))
+#let exer = thm-with-info(borderless-base("Exercise"))
+#let exerstar = thm-with-info(borderless-base("Exercise (*)"))
+#let ques = thm-with-info(borderless-base("Question"))
+#let fact = thm-with-info(borderless-base("Fact"))
 
 #let todo = thm-plain("TODO", fill: rgb("#ddaa77"), padding: (x: 0.2em, y: 0.2em), outset: 0.4em).with(numbering: none)
 #let proof = thm-proof("Proof")
@@ -276,18 +546,38 @@
   // Section headers
   set heading(numbering: "1.1")
   show heading: it => {
-    block([
-      #if (it.numbering != none) [
+    if (it.numbering != none) [
+        #if(it.level != 1){[
+          #block(width: 100%, [
         #text(fill:colors.headers,
           (if (report-style and it.level == 1) { "Chapter " } else { "" })
           + counter(heading).display()
           + (if (report-style and it.level == 1) { "." } else { "" })
         )
         #h(0.2em)
-      ]
       #it.body
       #v(0.4em)
     ])
+      ]}else{[
+        #pagebreak()
+        #block(width: 100%,
+        [
+          #box(width: 100%, stroke: (bottom: 2pt), inset: 10pt,
+        align(center, text(size: 20pt, 
+        [
+          #it.body
+        ]))
+        )
+        #emph(text(size: 27pt, weight: "medium")[§#counter(heading).display()])
+        #v(1.5em)
+      ])
+      ]}
+
+    
+  ]else[
+      #it.body
+      #v(0.4em)
+  ]
   }
   show heading: set text(size: 11pt)
   show heading.where(level: 1): set text(size: 14pt)

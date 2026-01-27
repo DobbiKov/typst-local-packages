@@ -972,8 +972,10 @@
 /// scale-preview: 95%,
 /// scope: (thm-rules: thm-rules-1)
 /// )
+#let thm-red-color = color.rgb(110, 0, 40)
 #let thm-proof = thm-rem.with(
-    name-fmt: emph,
+    name-fmt: x => text(fill: thm-red-color, weight: "bold")[#emph(x)],
+    title-fmt: x => text(fill: thm-red-color, weight: "bold")[#emph(x)],
     body-fmt: proof-body-fmt,
 )
 
