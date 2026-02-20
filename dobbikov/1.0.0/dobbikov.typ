@@ -11,7 +11,7 @@
   title: black,
   headers: black,
   partfill: rgb("#002299"),
-  label: red,
+  label: black,
   hyperlink: blue,
   strong: black,
   thm-ref: black
@@ -332,6 +332,7 @@
 ) = thm-borderless-style(thm-red-color)(
   head,
   separator: separator,
+  body-fmt: x => [#text(fill: black)[#emph(x)]#h(1fr)#text(fill: thm-red-color)[$diamond.small$]],
   ..thm-args,
   ..args,
 )
@@ -372,12 +373,12 @@
 
 #let defn = thm-with-info(border-base("Definition"))
 #let thm = thm-with-info(leftbars-base("Theorem"))
-#let lem = thm-with-info(border-base("Lemma"))
+#let lem = thm-with-info(borderless-base("Lemma"))
 #let prop = thm-with-info(border-base("Proposition"))
 #let notation = thm-with-info(borderless-base("Notation"))
 #let cor = thm-with-info(borderless-base("Corollary"))
 #let conj = thm-with-info(borderless-base("Conjecture"))
-#let ex = thm-with-info(border-base("Example"))
+#let ex = thm-with-info(borderless-base("Example"))
 #let algo = thm-def("Algorithm", fill: rgb("#ddffdd"), ..thm-args)
 #let claim = thm-def("Claim", fill: rgb("#ddffdd"), ..thm-args)
 #let rmk = thm-with-info(borderless-base("Remark"))
@@ -450,6 +451,11 @@
   report-style: false,
   body
 ) = {
+  set text(
+    font: fonts.text,
+    size: 11pt,
+    fallback: false,
+  )
   // Set document parameters
   if (title != none) {
     set document(title: title)
@@ -487,7 +493,7 @@
   // Report parameters
   show ref: it => {
     let el = it.element
-    if el != none and el.func() == heading and el.level == 1 and it.supplement == auto and report-style {
+    if el != none and el.func() == heading and el.level == 1 and it.supplement == auto and not report-style {
       ref(it.target, supplement: "Chapter")
     } else {
       it
@@ -517,11 +523,6 @@
     justify: true,
     first-line-indent: 1em
   )
-  set text(
-    font: fonts.text,
-    size: 11pt,
-    fallback: false,
-  )
 
   // For bold elements, use sans font
   show strong: set text(size: 0.9em)
@@ -547,12 +548,12 @@
   set heading(numbering: "1.1")
   show heading: it => {
     if (it.numbering != none) [
-        #if(it.level != 1){[
+        #if(it.level != 1 or report-style == true){[
           #block(width: 100%, [
         #text(fill:colors.headers,
-          (if (report-style and it.level == 1) { "Chapter " } else { "" })
+          (if (not report-style and it.level == 1) { "Chapter " } else { "" })
           + counter(heading).display()
-          + (if (report-style and it.level == 1) { "." } else { "" })
+          + (if (not report-style and it.level == 1) { "." } else { "" })
         )
         #h(0.2em)
       #it.body
