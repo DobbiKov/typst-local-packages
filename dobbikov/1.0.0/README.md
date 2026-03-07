@@ -13,6 +13,7 @@ figure/table styling, theorem environments, and gentle-clues callouts.
   subtitle: none,
   author: "Yehor KOROTENKO",
   date: datetime.today(),
+  language: "en",
 )
 
 #toc
@@ -39,6 +40,7 @@ simple title page.
   date: datetime.today(),
   maketitle: true,
   report-style: false,
+  language: "en",
 )
 ```
 
@@ -49,6 +51,7 @@ Parameters:
 - `date`: `datetime` or string; use `none` to skip.
 - `maketitle`: render a title page-like block at top.
 - `report-style`: if `true`, heading level 1 is treated as chapters in refs.
+- `language`: UI language for auto labels and theorem names. Allowed values: `"en"`, `"fr"`, `"ua"`.
 
 ## Table of contents
 

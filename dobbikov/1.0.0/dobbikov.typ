@@ -16,13 +16,99 @@
   strong: black,
   thm-ref: black
 )
+#let _dobbikov-lang = state("dobbikov-lang", "en")
+#let _dobbikov-i18n = (
+  en: (
+    "table-of-contents": "Table of contents",
+    section: "Section",
+    chapter: "Chapter",
+    figure: "Figure",
+    theorem: "Theorem",
+    definition: "Definition",
+    lemma: "Lemma",
+    proposition: "Proposition",
+    notation: "Notation",
+    corollary: "Corollary",
+    conjecture: "Conjecture",
+    example: "Example",
+    algorithm: "Algorithm",
+    claim: "Claim",
+    remark: "Remark",
+    problem: "Problem",
+    exercise: "Exercise",
+    "exercise-star": "Exercise (*)",
+    question: "Question",
+    fact: "Fact",
+    proof: "Proof",
+    solution: "Solution",
+  ),
+  fr: (
+    "table-of-contents": "Table des matieres",
+    section: "Section",
+    chapter: "Chapitre",
+    figure: "Figure",
+    theorem: "Theoreme",
+    definition: "Definition",
+    lemma: "Lemme",
+    proposition: "Proposition",
+    notation: "Notation",
+    corollary: "Corollaire",
+    conjecture: "Conjecture",
+    example: "Exemple",
+    algorithm: "Algorithme",
+    claim: "Assertion",
+    remark: "Remarque",
+    problem: "Probleme",
+    exercise: "Exercice",
+    "exercise-star": "Exercice (*)",
+    question: "Question",
+    fact: "Fait",
+    proof: "Preuve",
+    solution: "Solution",
+  ),
+  ua: (
+    "table-of-contents": "Зміст",
+    section: "Розділ",
+    chapter: "Розділ",
+    figure: "Рисунок",
+    theorem: "Теорема",
+    definition: "Означення",
+    lemma: "Лема",
+    proposition: "Пропозиція",
+    notation: "Позначення",
+    corollary: "Наслідок",
+    conjecture: "Гіпотеза",
+    example: "Приклад",
+    algorithm: "Алгоритм",
+    claim: "Твердження",
+    remark: "Зауваження",
+    problem: "Задача",
+    exercise: "Вправа",
+    "exercise-star": "Вправа (*)",
+    question: "Питання",
+    fact: "Факт",
+    proof: "Доведення",
+    solution: "Розв'язок",
+  ),
+)
+
+#let _normalize-language(language) = {
+  if language == "en" or language == "fr" or language == "ua" {
+    language
+  } else {
+    panic("dobbikov: `language` must be one of \"ua\", \"fr\", \"en\".")
+  }
+}
+
+#let _typst-language(language) = if language == "ua" { "uk" } else { language }
+#let _tr(language, key) = _dobbikov-i18n.at(language).at(key)
 
 #let toc = {
   show outline.entry.where(level: 1): it => {
     v(1.2em, weak:true)
     text(weight:"bold", font:fonts.sans, it)
   }
-  text(fill:colors.title, size:1.4em, font:fonts.sans, [*Table of contents*])
+  text(fill:colors.title, size:1.4em, font:fonts.sans, [*#context _tr(_dobbikov-lang.get(), "table-of-contents")*])
   v(0.6em)
   outline(
     title: none,
@@ -371,26 +457,28 @@
   }
 }
 
-#let defn = thm-with-info(border-base("Definition"))
-#let thm = thm-with-info(leftbars-base("Theorem"))
-#let lem = thm-with-info(borderless-base("Lemma"))
-#let prop = thm-with-info(border-base("Proposition"))
-#let notation = thm-with-info(borderless-base("Notation"))
-#let cor = thm-with-info(borderless-base("Corollary"))
-#let conj = thm-with-info(borderless-base("Conjecture"))
-#let ex = thm-with-info(borderless-base("Example"))
-#let algo = thm-def("Algorithm", fill: rgb("#ddffdd"), ..thm-args)
-#let claim = thm-def("Claim", fill: rgb("#ddffdd"), ..thm-args)
-#let rmk = thm-with-info(borderless-base("Remark"))
-#let prob = thm-with-info(borderless-base("Problem"))
-#let exer = thm-with-info(borderless-base("Exercise"))
-#let exerstar = thm-with-info(borderless-base("Exercise (*)"))
-#let ques = thm-with-info(borderless-base("Question"))
-#let fact = thm-with-info(borderless-base("Fact"))
+#let _localized-head(key) = context _tr(_dobbikov-lang.get(), key)
+
+#let defn = thm-with-info(border-base(_localized-head("definition")))
+#let thm = thm-with-info(leftbars-base(_localized-head("theorem")))
+#let lem = thm-with-info(borderless-base(_localized-head("lemma")))
+#let prop = thm-with-info(border-base(_localized-head("proposition")))
+#let notation = thm-with-info(borderless-base(_localized-head("notation")))
+#let cor = thm-with-info(borderless-base(_localized-head("corollary")))
+#let conj = thm-with-info(borderless-base(_localized-head("conjecture")))
+#let ex = thm-with-info(borderless-base(_localized-head("example")))
+#let algo = thm-def(_localized-head("algorithm"), fill: rgb("#ddffdd"), ..thm-args)
+#let claim = thm-def(_localized-head("claim"), fill: rgb("#ddffdd"), ..thm-args)
+#let rmk = thm-with-info(borderless-base(_localized-head("remark")))
+#let prob = thm-with-info(borderless-base(_localized-head("problem")))
+#let exer = thm-with-info(borderless-base(_localized-head("exercise")))
+#let exerstar = thm-with-info(borderless-base(_localized-head("exercise-star")))
+#let ques = thm-with-info(borderless-base(_localized-head("question")))
+#let fact = thm-with-info(borderless-base(_localized-head("fact")))
 
 #let todo = thm-plain("TODO", fill: rgb("#ddaa77"), padding: (x: 0.2em, y: 0.2em), outset: 0.4em).with(numbering: none)
-#let proof = thm-proof("Proof")
-#let soln = thm-proof("Solution")
+#let proof = thm-proof(_localized-head("proof"))
+#let soln = thm-proof(_localized-head("solution"))
 
 // i have no idea how this works but it seems to work ¯\_(ツ)_/¯
 #let recall-thm(target-label) = {
@@ -449,11 +537,15 @@
   date: none,
   maketitle: true,
   report-style: false,
+  language: "en",
   body
 ) = {
+  let language = _normalize-language(language)
+  _dobbikov-lang.update(_ => language)
   set text(
     font: fonts.text,
     size: 11pt,
+    lang: _typst-language(language),
     fallback: false,
   )
   // Set document parameters
@@ -494,7 +586,7 @@
   show ref: it => {
     let el = it.element
     if el != none and el.func() == heading and el.level == 1 and it.supplement == auto and not report-style {
-      ref(it.target, supplement: "Chapter")
+      ref(it.target, supplement: _tr(language, "chapter"))
     } else {
       it
     }
@@ -551,7 +643,7 @@
         #if(it.level != 1 or report-style == true){[
           #block(width: 100%, [
         #text(fill:colors.headers,
-          (if (not report-style and it.level == 1) { "Chapter " } else { "" })
+          (if (not report-style and it.level == 1) { _tr(language, "chapter") + " " } else { "" })
           + counter(heading).display()
           + (if (not report-style and it.level == 1) { "." } else { "" })
         )

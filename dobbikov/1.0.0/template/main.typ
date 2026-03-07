@@ -5,6 +5,7 @@
   subtitle: none,
   author: "Yehor KORORTENKO",
   date: datetime.today(),
+  language: "en",
 )
 
 #toc
