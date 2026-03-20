@@ -223,7 +223,7 @@
   } else {
     body-fmt
   }
-  thm-plain.with(
+  thm-plain2.with(
     fill: fill,
     stroke: stroke-color + stroke-width,
     title-fmt: title-fmt,
@@ -357,7 +357,10 @@
       }
       title = title-fmt(title)
       body = body-fmt(body)
-      let content = block(width: 100%, [#title#name#separator#body])
+      let content = block(width: 100%, {
+        set par(first-line-indent: 0pt)
+        [#title#name#separator#body]
+      })
       let bars = block(
         width: 100%,
         fill: fill,
@@ -424,7 +427,11 @@
 ) = def-red-style(
   head,
   separator: separator,
-  ..thm-args,
+  counter: "thm",
+  base-level: 1,
+  padding: (x: 0.8pt, y: 0.6em),
+  inset: (x: 0.5em, y: 0.8em),
+  outset: 0pt,
   ..args,
 )
 #let borderless-base(
@@ -448,7 +455,10 @@
 ) = thm-leftbars-style(thm-red-color)(
   head,
   separator: separator,
-  ..thm-args,
+  counter: "thm",
+  base-level: 1,
+  padding: (x: 0.5em, y: 0.6em),
+  outset: 0pt,
   ..args,
 )
 /// Wraps a theorem environment to add an optional `info` parameter.
