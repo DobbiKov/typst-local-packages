@@ -202,19 +202,20 @@
 /// - fill (color|none): Box fill.
 #let thm-border-style(
   stroke-color,
-  stroke-width: 0.5pt,
+  stroke-width: 0.8pt,
   title-fmt: auto,
   name-fmt: auto,
   body-fmt: auto,
   fill: none,
 ) = {
+  let emph-delta = 160
   let title-fmt = if title-fmt == auto {
-    x => text(fill: stroke-color)[#strong(smallcaps([#x]))]
+    x => text(fill: stroke-color)[#strong(smallcaps([#x]), delta: emph-delta)]
   } else {
     title-fmt
   }
   let name-fmt = if name-fmt == auto {
-    x => text(fill: stroke-color)[#strong(smallcaps([~(#x)]))]
+    x => text(fill: stroke-color)[#strong(smallcaps([~(#x)]), delta: emph-delta)]
   } else {
     name-fmt
   }
@@ -294,7 +295,7 @@
 /// - separator/title-fmt/name-fmt/body-fmt/fill: Same as in @@thm-border-style.
 #let thm-leftbars-style(
   accent-color,
-  bar-width: 0.6pt,
+  bar-width: 0.8pt,
   bar-gap: 1.2pt,
   inner-gap: 0.6em,
   separator: [.#h(0.2em)],
@@ -457,7 +458,8 @@
   separator: separator,
   counter: "thm",
   base-level: 1,
-  padding: (x: 0.5em, y: 0.6em),
+  padding: (x: 0.2em, y: 0.6em),
+  inset: (x: 0em, y: 0.8em),
   outset: 0pt,
   ..args,
 )
