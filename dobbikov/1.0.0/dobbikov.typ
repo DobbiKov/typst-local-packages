@@ -255,14 +255,30 @@
   name-fmt: auto,
   body-fmt: auto,
   fill: none,
-) = thm-border-style(
-  accent-color,
-  stroke-width: 0pt,
-  title-fmt: title-fmt,
-  name-fmt: name-fmt,
-  body-fmt: body-fmt,
-  fill: fill,
-)
+) = {
+  let title-fmt = if title-fmt == auto {
+    x => text(fill: accent-color)[#strong(smallcaps([#x]))]
+  } else {
+    title-fmt
+  }
+  let name-fmt = if name-fmt == auto {
+    x => text(fill: accent-color)[#strong(smallcaps([~(#x)]))]
+  } else {
+    name-fmt
+  }
+  let body-fmt = if body-fmt == auto {
+    x => text(fill: black)[#emph(x)]
+  } else {
+    body-fmt
+  }
+  thm-plain2.with(
+    fill: fill,
+    stroke: accent-color + 0pt,
+    title-fmt: title-fmt,
+    name-fmt: name-fmt,
+    body-fmt: body-fmt,
+  )
+}
 
 /// Creates a left-double-bar style (two vertical bars on the left).
 /// Example:
@@ -419,7 +435,10 @@
   head,
   separator: separator,
   body-fmt: x => [#text(fill: black)[#emph(x)]#h(1fr)#text(fill: thm-red-color)[$diamond.small$]],
-  ..thm-args,
+  counter: "thm",
+  base-level: 1,
+  padding: (x: 0pt, y: 0.6em),
+  outset: 0pt,
   ..args,
 )
 #let leftbars-base(

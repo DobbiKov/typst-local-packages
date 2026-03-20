@@ -734,7 +734,10 @@
         width: 100%,
         ..args.named(),
         ..args_individual.named(),
-        [#title#name#separator#body]
+        {
+          set par(first-line-indent: 0pt)
+          [#title#name#separator#body]
+        }
       )
     )
   }
@@ -796,6 +799,13 @@
 /// scope: (thm-rules: thm-rules-1)
 /// )
 #let thm-plain = thm-box.with(
+  title-fmt: strong,
+  body-fmt: emph,
+  separator: [*.*#h(0.2em)],
+)
+
+// Like thm-plain but uses thm-box2 which resets first-line-indent to 0pt
+#let thm-plain2 = thm-box2.with(
   title-fmt: strong,
   body-fmt: emph,
   separator: [*.*#h(0.2em)],
