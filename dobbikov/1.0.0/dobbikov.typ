@@ -560,6 +560,8 @@
 #let h5(..args) = heading(level: 5, outlined: false, numbering: none, ..args)
 #let h6(..args) = heading(level: 6, outlined: false, numbering: none, ..args)
 
+#let standard_font_size = 11pt
+
 // Main entry point to use in a global show rule
 #let dobbikov(
   title: [tit],
@@ -575,7 +577,7 @@
   _dobbikov-lang.update(_ => language)
   set text(
     font: fonts.text,
-    size: 11pt,
+    size: standard_font_size,
     lang: _typst-language(language),
     fallback: false,
   )
@@ -673,17 +675,20 @@
     if (it.numbering != none) [
         #if(it.level != 1 or report-style == true){[
           #block(width: 100%, [
-        #text(fill:colors.headers,
-          (if (not report-style and it.level == 1) { _tr(language, "chapter") + " " } else { "" })
-          + counter(heading).display()
-          + (if (not report-style and it.level == 1) { "." } else { "" })
-        )
-        #h(0.2em)
-      #it.body
-      #v(0.4em)
+            #align(center)[
+            #text(fill:colors.headers, size: standard_font_size,
+              (if (not report-style and it.level == 1) { _tr(language, "chapter") + " " } else { "" })
+              + counter(heading).display()
+              + (if (not report-style and it.level == 1) { "." } else { "" })
+            )
+            #h(0.2em)
+            #text(size: standard_font_size, it.body)
+          #v(0.4em)
+        ]
     ])
       ]}else{[
         #pagebreak()
+        #v(1.8em)
         #block(width: 100%,
         [
           #box(width: 100%, stroke: (bottom: 2pt), inset: 10pt,
