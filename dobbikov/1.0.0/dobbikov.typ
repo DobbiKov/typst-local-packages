@@ -7,12 +7,13 @@
   sans: (latex_font),
   mono: (latex_font),
 )
+#let thm-red-color = color.rgb(110, 0, 40)
 #let colors = (
   title: black,
   headers: black,
   partfill: rgb("#002299"),
   label: black,
-  hyperlink: blue,
+  hyperlink: thm-red-color,
   strong: black,
   thm-ref: black
 )
@@ -41,6 +42,7 @@
     fact: "Fact",
     proof: "Proof",
     solution: "Solution",
+    insight: "Insight"
   ),
   fr: (
     "table-of-contents": "Table des matieres",
@@ -65,6 +67,7 @@
     fact: "Fait",
     proof: "Preuve",
     solution: "Solution",
+    insight: "Intuition"
   ),
   ua: (
     "table-of-contents": "Зміст",
@@ -89,6 +92,7 @@
     fact: "Факт",
     proof: "Доведення",
     solution: "Розв'язок",
+    insight: "Інтуїція"
   ),
 )
 
@@ -397,7 +401,6 @@
   }
 }
 
-#let thm-red-color = color.rgb(110, 0, 40)
 #let thm-red = thm-plain(
   "Theorem",
   fill: none,
@@ -493,6 +496,7 @@
 #let defn = thm-with-info(border-base(_localized-head("definition")))
 #let thm = thm-with-info(leftbars-base(_localized-head("theorem")))
 #let lem = thm-with-info(borderless-base(_localized-head("lemma")))
+#let insight = thm-with-info(borderless-base(_localized-head("insight")))
 #let prop = thm-with-info(border-base(_localized-head("proposition")))
 #let notation = thm-with-info(borderless-base(_localized-head("notation")))
 #let cor = thm-with-info(borderless-base(_localized-head("corollary")))
@@ -682,7 +686,7 @@
               + (if (not report-style and it.level == 1) { "." } else { "" })
             )
             #h(0.2em)
-            #text(size: standard_font_size, it.body)
+            #text(size: standard_font_size, smallcaps[#it.body])
           #v(0.4em)
         ]
     ])
@@ -733,12 +737,12 @@
     v(2.5em)
     set align(center)
     set block(spacing: 2em)
-    block(text(fill:colors.title, size:2em, weight:"bold", title))
+    block(text(fill:colors.title, size:18pt, weight:"bold", title))
     if (subtitle != none) {
-      block(text(size:1.5em, font:fonts.sans, weight:"bold", subtitle))
+      block(text(size:16pt, font:fonts.sans, weight:"bold", subtitle))
     }
     if (author != none) {
-      block(smallcaps(text(size:1.7em, author)))
+      block(smallcaps(text(size:12pt, author)))
     }
     if (type(date) == datetime) {
       block(text(size:1.2em, date.display("[day] [month repr:long] [year]")))
